@@ -1,0 +1,151 @@
+{
+  "entities": {
+    "Event": {
+      "title": "Event",
+      "description": "An organized event with budget, timeline, vendors, and collaboration settings",
+      "type": "object",
+      "properties": {
+        "id": {
+          "type": "string",
+          "description": "Unique identifier for the event",
+          "maxLength": 128
+        },
+        "ownerId": {
+          "type": "string",
+          "description": "UID of the event creator",
+          "maxLength": 128
+        },
+        "ownerEmail": {
+          "type": "string",
+          "description": "Email address of the event creator",
+          "maxLength": 256
+        },
+        "name": {
+          "type": "string",
+          "description": "Name or title of the event",
+          "maxLength": 200,
+          "minLength": 1
+        },
+        "eventType": {
+          "type": "string",
+          "description": "Category of event: wedding, birthday, or community",
+          "enum": ["wedding", "birthday", "community"]
+        },
+        "date": {
+          "type": "string",
+          "description": "Target date for the event in ISO format",
+          "maxLength": 30
+        },
+        "guestCount": {
+          "type": "number",
+          "description": "Expected number of attendees"
+        },
+        "totalBudget": {
+          "type": "number",
+          "description": "Total allocated budget"
+        },
+        "currency": {
+          "type": "string",
+          "description": "Currency code",
+          "enum": ["INR", "USD", "EUR", "GBP"]
+        },
+        "city": {
+          "type": "string",
+          "description": "City or destination where event takes place",
+          "maxLength": 150
+        },
+        "theme": {
+          "type": "string",
+          "description": "Theme, visual preferences, or vibe description",
+          "maxLength": 500
+        },
+        "notes": {
+          "type": "string",
+          "description": "Dietary, cultural, or special requirements",
+          "maxLength": 1000
+        },
+        "editors": {
+          "type": "array",
+          "description": "List of user UIDs or emails with edit permissions"
+        },
+        "viewers": {
+          "type": "array",
+          "description": "List of user UIDs or emails with view-only permissions"
+        },
+        "vendorsState": {
+          "type": "string",
+          "description": "JSON string representing custom vendor checklist items and statuses",
+          "maxLength": 50000
+        },
+        "ideasState": {
+          "type": "string",
+          "description": "JSON string representing generated AI or fallback ideas",
+          "maxLength": 50000
+        },
+        "createdAt": {
+          "type": "string",
+          "description": "Creation timestamp",
+          "maxLength": 50
+        },
+        "updatedAt": {
+          "type": "string",
+          "description": "Last update timestamp",
+          "maxLength": 50
+        }
+      },
+      "required": ["id", "ownerId", "name", "eventType", "date", "guestCount", "totalBudget", "currency", "city"]
+    },
+    "EventActivity": {
+      "title": "EventActivity",
+      "description": "Real-time activity and collaborative notes log for an event",
+      "type": "object",
+      "properties": {
+        "id": {
+          "type": "string",
+          "description": "Unique identifier for the activity item",
+          "maxLength": 128
+        },
+        "eventId": {
+          "type": "string",
+          "description": "Parent event identifier",
+          "maxLength": 128
+        },
+        "userId": {
+          "type": "string",
+          "description": "Author UID",
+          "maxLength": 128
+        },
+        "userEmail": {
+          "type": "string",
+          "description": "Author display name or email",
+          "maxLength": 256
+        },
+        "message": {
+          "type": "string",
+          "description": "Collaborative message or change summary",
+          "maxLength": 1000
+        },
+        "timestamp": {
+          "type": "string",
+          "description": "Timestamp ISO string",
+          "maxLength": 50
+        }
+      },
+      "required": ["id", "eventId", "userId", "message"]
+    }
+  },
+  "firestore": {
+    "/events/{eventId}": {
+      "schema": "Event",
+      "description": "Event plans with budget, timeline, vendors, and collaboration members"
+    },
+    "/events/{eventId}/activities/{activityId}": {
+      "schema": "EventActivity",
+      "description": "Collaborative real-time activity and messages for an event"
+    },
+    "/test/{docId}": {
+      "schema": "EventActivity",
+      "description": "Connection test document path"
+    }
+  }
+}

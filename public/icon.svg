@@ -1,0 +1,29 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" width="512" height="512">
+  <defs>
+    <linearGradient id="bgGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#3730A3"/>
+      <stop offset="100%" stop-color="#C2410C"/>
+    </linearGradient>
+    <linearGradient id="starGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#FDE047"/>
+      <stop offset="100%" stop-color="#FB923C"/>
+    </linearGradient>
+  </defs>
+  <rect width="512" height="512" rx="112" fill="url(#bgGrad)"/>
+  <!-- Calendar Base -->
+  <rect x="96" y="128" width="320" height="280" rx="28" fill="#FFFFFF" fill-opacity="0.96"/>
+  <!-- Calendar Header Strip -->
+  <path d="M 96 156 C 96 140.5 108.5 128 124 128 L 388 128 C 403.5 128 416 140.5 416 156 L 416 200 L 96 200 Z" fill="#E8563F"/>
+  <!-- Calendar Rings -->
+  <rect x="156" y="96" width="24" height="60" rx="12" fill="#1E1B4B"/>
+  <rect x="332" y="96" width="24" height="60" rx="12" fill="#1E1B4B"/>
+  <!-- Grid Dots / Sparkles -->
+  <circle cx="160" cy="256" r="14" fill="#3730A3"/>
+  <circle cx="256" cy="256" r="14" fill="#3730A3"/>
+  <circle cx="352" cy="256" r="14" fill="#3730A3"/>
+  <circle cx="160" cy="336" r="14" fill="#3730A3"/>
+  <circle cx="256" cy="336" r="14" fill="#E8563F"/>
+  <!-- GenAI Star / Sparkle Icon Top Right -->
+  <path d="M 380 70 L 392 104 L 426 116 L 392 128 L 380 162 L 368 128 L 334 116 L 368 104 Z" fill="url(#starGrad)"/>
+  <path d="M 440 160 L 446 178 L 464 184 L 446 190 L 440 208 L 434 190 L 416 184 L 434 178 Z" fill="#FDE047"/>
+</svg>

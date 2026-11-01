@@ -1,0 +1,104 @@
+rules_version = '2';
+service cloud.firestore {
+  match /databases/{database}/documents {
+    // Default-deny catch-all
+    match /{document=**} {
+      allow read, write: if false;
+    }
+
+    function isSignedIn() {
+      return request.auth != null;
+    }
+
+    function incoming() {
+      return request.resource.data;
+    }
+
+    function existing() {
+      return resource.data;
+    }
+
+    function isValidId(id) {
+      return id is string && id.size() > 0 && id.size() <= 128 && id.matches('^[a-zA-Z0-9_\\-]+$');
+    }
+
+    function canReadEvent(eventData) {
+      return isSignedIn() && (
+        eventData.ownerId == request.auth.uid ||
+        (eventData.editors is list && (request.auth.uid in eventData.editors || (request.auth.token.email != null && request.auth.token.email in eventData.editors))) ||
+        (eventData.viewers is list && (request.auth.uid in eventData.viewers || (request.auth.token.email != null && request.auth.token.email in eventData.viewers)))
+      );
+    }
+
+    function canEditEvent(eventData) {
+      return isSignedIn() && (
+        eventData.ownerId == request.auth.uid ||
+        (eventData.editors is list && (request.auth.uid in eventData.editors || (request.auth.token.email != null && request.auth.token.email in eventData.editors)))
+      );
+    }
+
+    function isValidEvent(data) {
+      return data.keys().hasAll(['id', 'ownerId', 'name', 'eventType', 'date', 'guestCount', 'totalBudget', 'currency', 'city']) &&
+        data.id is string && data.id.size() <= 128 &&
+        data.ownerId is string && data.ownerId.size() <= 128 &&
+        data.name is string && data.name.size() > 0 && data.name.size() <= 200 &&
+        data.eventType in ['wedding', 'birthday', 'community'] &&
+        data.date is string && data.date.size() <= 30 &&
+        data.guestCount is number && data.guestCount >= 1 && data.guestCount <= 10000 &&
+        data.totalBudget is number && data.totalBudget > 0 && data.totalBudget <= 1000000000 &&
+        data.currency in ['INR', 'USD', 'EUR', 'GBP'] &&
+        data.city is string && data.city.size() <= 150 &&
+        (!('theme' in data) || (data.theme is string && data.theme.size() <= 500)) &&
+        (!('notes' in data) || (data.notes is string && data.notes.size() <= 1000)) &&
+        (!('editors' in data) || (data.editors is list && data.editors.size() <= 50)) &&
+        (!('viewers' in data) || (data.viewers is list && data.viewers.size() <= 50)) &&
+        (!('vendorsState' in data) || (data.vendorsState is string && data.vendorsState.size() <= 50000)) &&
+        (!('ideasState' in data) || (data.ideasState is string && data.ideasState.size() <= 50000));
+    }
+
+    function isValidActivity(data) {
+      return data.keys().hasAll(['id', 'eventId', 'userId', 'message']) &&
+        data.id is string && data.id.size() <= 128 &&
+        data.eventId is string && data.eventId.size() <= 128 &&
+        data.userId is string && data.userId.size() <= 128 &&
+        data.message is string && data.message.size() > 0 && data.message.size() <= 1000 &&
+        (!('userEmail' in data) || (data.userEmail is string && data.userEmail.size() <= 256)) &&
+        (!('timestamp' in data) || (data.timestamp is string && data.timestamp.size() <= 50));
+    }
+
+    match /test/{docId} {
+      allow get: if true;
+    }
+
+    match /events/{eventId} {
+      allow get: if canReadEvent(resource.data);
+      allow list: if isSignedIn() && (
+        resource.data.ownerId == request.auth.uid ||
+        (resource.data.editors is list && request.auth.uid in resource.data.editors) ||
+        (resource.data.viewers is list && request.auth.uid in resource.data.viewers)
+      );
+      allow create: if isSignedIn() &&
+        isValidId(eventId) &&
+        isValidEvent(incoming()) &&
+        incoming().ownerId == request.auth.uid;
+      allow update: if isValidId(eventId) &&
+        canEditEvent(existing()) &&
+        isValidEvent(incoming()) &&
+        incoming().ownerId == existing().ownerId;
+      allow delete: if isValidId(eventId) &&
+        isSignedIn() &&
+        resource.data.ownerId == request.auth.uid;
+
+      match /activities/{activityId} {
+        allow read: if isSignedIn() && canReadEvent(get(/databases/$(database)/documents/events/$(eventId)).data);
+        allow create: if isSignedIn() &&
+          isValidId(activityId) &&
+          canEditEvent(get(/databases/$(database)/documents/events/$(eventId)).data) &&
+          incoming().userId == request.auth.uid &&
+          incoming().eventId == eventId &&
+          isValidActivity(incoming());
+        allow update, delete: if false;
+      }
+    }
+  }
+}
