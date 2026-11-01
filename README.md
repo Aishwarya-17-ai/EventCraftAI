@@ -264,7 +264,9 @@ EventCraft AI is optimized for mobile touchscreens:
 - **Receipt Scanning**: Multi-modal photo upload to parse vendor invoices into the budget checklist using Gemini Flash vision.
 - **Dynamic Currency Rates**: Integration of live forex exchange rates when hosting destination events across multiple countries.
 
----
+## 🔗 Live Demo / Prototype
+
+Explore the EventCraft AI prototype here:https://eventcraftai-89df.onrender.com/
 
 ## License
 
